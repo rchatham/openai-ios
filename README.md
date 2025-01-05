@@ -1,8 +1,8 @@
 # OpenAI.swift
 
-Check out [LangTools.swift](https://github.com/rchatham/LangTools.swift) for updated implementations for the OpenAI and Anthropic SDKs. 
+## Check out [LangTools.swift](https://github.com/rchatham/LangTools.swift) for updated implementations for the OpenAI and Anthropic APIs. 
 
-DEPRECATED:
+⚠️_**DEPRECATED:**_⚠️
 
 The smallest OpenAI API implementation written in Swift. 
 
