@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/rchatham/LangTools.swift.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "be85365661d5150ad00f7631d42d221c4f4c841a"
+        "revision" : "ceb6fa53de86e810762a85f74afca7deb0ff7c89",
+        "version" : "0.0.1"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
       "state" : {
-        "revision" : "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
-        "version" : "5.0.1"
+        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+        "version" : "5.0.2"
       }
     }
   ],

@@ -17,7 +17,7 @@ let package = Package(
             targets: ["OpenAI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/rchatham/LangTools.swift.git", branch: "main"),
+        .package(url: "https://github.com/rchatham/LangTools.swift.git", exact: "0.0.1"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0"),
     ],
     targets: [
