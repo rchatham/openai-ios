@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import LangTools
+
 
 public extension OpenAI {
     func performChatCompletionRequest(messages: [Message], model: Model, stream: Bool = false, completion: @escaping (Result<OpenAI.ChatCompletionResponse, Error>) -> Void, didCompleteStreaming: ((Error?) -> Void)? = nil) {
@@ -14,15 +16,16 @@ public extension OpenAI {
 }
 
 public extension OpenAI {
-    struct ChatCompletionRequest: Codable, OpenAIRequest, StreamableRequest, CompletableRequest {
+    struct ChatCompletionRequest: Codable, LangToolRequest, StreamableLangToolRequest, CompletableLangToolRequest {
         public typealias Response = ChatCompletionResponse
         public static var path: String { "chat/completions" }
+        public static var url: URL { baseURL.appending(path: path) }
         let model: Model
         let messages: [Message]
         let temperature: Double?
         let top_p: Double?
         let n: Int? // how many chat completions to generate for each request
-        var stream: Bool?
+        public var stream: Bool?
         let stream_options: StreamOptions?
         let stop: Stop?
         let max_tokens: Int?
@@ -178,7 +181,7 @@ public extension OpenAI {
         }
     }
 
-    struct ChatCompletionResponse: StreamableResponse, Codable {
+    struct ChatCompletionResponse: Codable, StreamableLangToolResponse {
         public let id: String
         public let object: String // chat.completion or chat.completion.chunk
         public let created: Int
@@ -192,7 +195,7 @@ public extension OpenAI {
             public let message: Message?
             public let finish_reason: FinishReason?
             public let delta: Message.Delta?
-            
+
             public enum FinishReason: String, Codable {
                 case stop, length, content_filter, tool_calls
             }
@@ -241,7 +244,7 @@ public extension OpenAI {
             return zip(choices.sorted(), next.sorted()).map { $0.combining(with: $1) }
         }
 
-        static var empty: ChatCompletionResponse { ChatCompletionResponse(id: "", object: "", created: -1, model: nil, system_fingerprint: nil, choices: [], usage: nil) }
+        public static var empty: ChatCompletionResponse { ChatCompletionResponse(id: "", object: "", created: -1, model: nil, system_fingerprint: nil, choices: [], usage: nil) }
     }
 
     enum ChatCompletionError: Error {

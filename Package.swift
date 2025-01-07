@@ -17,13 +17,15 @@ let package = Package(
             targets: ["OpenAI"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/rchatham/LangTools.swift.git", exact: "0.0.1"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "OpenAI"),
+            name: "OpenAI",
+            dependencies: [.product(name: "LangTools", package: "LangTools.swift")]),
         .testTarget(
             name: "OpenAITests",
             dependencies: ["OpenAI", "SwiftyJSON"],

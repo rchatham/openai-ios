@@ -6,9 +6,10 @@
 //
 
 import XCTest
+import LangTools
 @testable import OpenAI
 
-extension StreamableResponse where Self: Encodable {
+extension StreamableLangToolResponse where Self: Encodable {
     func streamData() throws -> Data {
         let jsonString = try data().string
         return ("data: " + jsonString).data(using: .utf8)!

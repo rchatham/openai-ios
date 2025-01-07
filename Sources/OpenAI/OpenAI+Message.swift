@@ -70,6 +70,10 @@ public extension OpenAI {
                 }
             }
 
+            public var string: String? {
+                if case .string(let str) = self { return str } else { return nil }
+            }
+
             public enum ContentType: Codable, CustomStringConvertible {
                 case text(TextContent)
                 case image(ImageContent)
