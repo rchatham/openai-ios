@@ -77,6 +77,7 @@ class MessageService {
             switch error {
             case .failedToDecodeFunctionArguments: print("error: failed to decode function args")
             case .missingRequiredFunctionArguments: print("error: missing args")
+            case .missingToolCallResponse: print("error: missing tool call response from developer")
             }
         } catch {
             fatalError("error: " + error.localizedDescription)

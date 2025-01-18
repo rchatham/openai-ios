@@ -38,7 +38,7 @@ public class OpenAI {
     }
 
     public func stream<Request: OpenAIRequest>(request: Request) -> AsyncThrowingStream<Request.Response, Error> {
-        if request.stream, request is ChatCompletionRequest, var chatReq: ChatCompletionRequest? = request as? ChatCompletionRequest { // Cannot type erase to (any StreamableRequest & Request)
+        if request.stream, request is ChatCompletionRequest, var chatReq: ChatCompletionRequest? = request as? ChatCompletionRequest { // Not allowed when type 'Request' constrained to non-protocol, non-class type 'any OpenAIRequest & StreamableRequest'
             let httpRequest: URLRequest; do { httpRequest = try configure(request: request) } catch { return AsyncThrowingStream { $0.finish(throwing: error) }}
             return streamManager.stream(task: session.dataTask(with: httpRequest)) {
                 chatReq = try chatReq?.completion(response: $0)
@@ -215,3 +215,18 @@ extension String {
 
 extension Optional { func flatMap<U>(_ a: (Wrapped) async throws -> U?) async throws -> U? { switch self { case .some(let wrapped): return try await a(wrapped); case .none: return nil }}}
 
+@propertyWrapper
+public struct CodableIgnored<T>: Codable {
+    public var wrappedValue: T?
+    public init(wrappedValue: T?) { self.wrappedValue = wrappedValue }
+    public init(from decoder: Decoder) throws { self.wrappedValue = nil }
+    public func encode(to encoder: Encoder) throws {} // Do nothing
+}
+
+extension KeyedDecodingContainer {
+    public func decode<T>(_ type: CodableIgnored<T>.Type, forKey key: Self.Key) throws -> CodableIgnored<T> { return CodableIgnored(wrappedValue: nil) }
+}
+
+extension KeyedEncodingContainer {
+    public mutating func encode<T>(_ value: CodableIgnored<T>, forKey key: KeyedEncodingContainer<K>.Key) throws {} // Do nothing
+}
