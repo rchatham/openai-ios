@@ -32,16 +32,16 @@ public class OpenAI {
     }
 
     // In order to call the function completion in non-streaming calls, we are unable to return the intermediate call and thus you can not mix responding to functions in your code AND using function closures. If this functionality is needed use streaming. This functionality may be able to be added via a configuration callback on the function or request in the future.
-    public func perform<Request: OpenAIRequest>(request: Request) async throws -> Request.Response {
+    public func perform<Request: OpenAIRequest>(request: Request, reconfigureCompletionRequest reconfig: @escaping (Request) -> Request? = { return $0 }) async throws -> Request.Response {
         let response: Request.Response = try await perform(request: try configure(request: request, stream: false))
-        return try await (request as? ChatCompletionRequest)?.completion(response: response as! OpenAI.ChatCompletionResponse).flatMap { try await perform(request: $0) as? Request.Response } ?? response
+        return try await (request as? ChatCompletionRequest)?.completion(response: response as! OpenAI.ChatCompletionResponse).flatMap { reconfig($0 as! Request) }.flatMap { try await perform(request: $0) } ?? response
     }
 
-    public func stream<Request: OpenAIRequest>(request: Request) -> AsyncThrowingStream<Request.Response, Error> {
-        if request.stream, request is ChatCompletionRequest, var chatReq: ChatCompletionRequest? = request as? ChatCompletionRequest { // Cannot type erase to (any StreamableRequest & Request)
+    public func stream<Request: OpenAIRequest>(request: Request, reconfigureCompletionRequest reconfig: @escaping (Request) -> Request? = { return $0 }) -> AsyncThrowingStream<Request.Response, Error> {
+        if request.stream, request is ChatCompletionRequest, var chatReq: ChatCompletionRequest? = request as? ChatCompletionRequest { // Not allowed when type 'Request' constrained to non-protocol, non-class type 'any OpenAIRequest & StreamableRequest'
             let httpRequest: URLRequest; do { httpRequest = try configure(request: request) } catch { return AsyncThrowingStream { $0.finish(throwing: error) }}
             return streamManager.stream(task: session.dataTask(with: httpRequest)) {
-                chatReq = try chatReq?.completion(response: $0)
+                chatReq = try chatReq?.completion(response: $0).flatMap { reconfig($0 as! Request) } as? ChatCompletionRequest
                 return try chatReq.flatMap { self.session.dataTask(with: try self.configure(request: $0)) }
             }
         }
